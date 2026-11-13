@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SwiftKeys — Typing Speed Challenge</title>
+  <link rel="stylesheet" href="style.css?v=4" />
+</head>
+<body>
+  <div class="app">
+
+    <header class="header">
+      <div class="logo">
+        <span class="logo-mark">⌨</span>
+        <h1>Swift<span>Keys</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="statsBtn" class="icon-btn" title="Stats dashboard" aria-label="Open stats dashboard">▤</button>
+        <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+      </div>
+    </header>
+
+    <section class="config" id="configBar">
+      <div class="config-group" role="group" aria-label="Test mode">
+        <button class="chip active" data-mode="words">Words</button>
+        <button class="chip" data-mode="sentences">Sentences</button>
+      </div>
+      <div class="config-divider"></div>
+      <div class="config-group" role="group" aria-label="Test duration">
+        <button class="chip" data-time="15">15s</button>
+        <button class="chip active" data-time="30">30s</button>
+        <button class="chip" data-time="60">60s</button>
+        <button class="chip" data-time="120">120s</button>
+      </div>
+      <div class="config-divider"></div>
+      <div class="config-group" role="group" aria-label="Difficulty">
+        <button class="chip active" data-difficulty="beginner">Beginner</button>
+        <button class="chip" data-difficulty="intermediate">Intermediate</button>
+        <button class="chip" data-difficulty="advanced">Advanced</button>
+      </div>
+    </section>
+
+    <section class="live-stats" id="liveStats">
+      <div class="live-stat">
+        <span class="live-value" id="timeLeft">30</span>
+        <span class="live-label">seconds</span>
+      </div>
+      <div class="live-stat">
+        <span class="live-value" id="liveWpm">0</span>
+        <span class="live-label">wpm</span>
+      </div>
+    </section>
+
+    <main class="test-area" id="testArea" tabindex="0">
+      <div class="words-window">
+        <div class="words" id="words">
+          <div class="caret" id="caret"></div>
+        </div>
+      </div>
+      <div class="focus-overlay" id="focusOverlay">
+        <p>Click here or press any key to focus</p>
+      </div>
+    </main>
+
+    <button class="restart-btn" id="restartInline" title="Restart test" aria-label="Restart test">↻ Restart</button>
+
+    <p class="hint">Start typing to begin · <kbd>Tab</kbd> restarts the test</p>
+
+    <!-- Results overlay -->
+    <div class="results hidden" id="results">
+      <div class="results-card">
+        <h2>Test complete</h2>
+        <div class="results-main">
+          <div class="result-big">
+            <span class="result-value" id="resultWpm">0</span>
+            <span class="result-label">WPM</span>
+          </div>
+          <div class="result-big">
+            <span class="result-value" id="resultAcc">0%</span>
+            <span class="result-label">Accuracy</span>
+          </div>
+        </div>
+        <div class="results-grid">
+          <div class="result-item">
+            <span class="result-item-value" id="resultRaw">0</span>
+            <span class="result-item-label">Raw WPM</span>
+          </div>
+          <div class="result-item">
+            <span class="result-item-value" id="resultChars">0 / 0</span>
+            <span class="result-item-label">Correct / wrong</span>
+          </div>
+          <div class="result-item">
+            <span class="result-item-value" id="resultTime">30s</span>
+            <span class="result-item-label">Duration</span>
+          </div>
+          <div class="result-item">
+            <span class="result-item-value" id="resultBest">—</span>
+            <span class="result-item-label">Best WPM</span>
+          </div>
+        </div>
+        <p class="result-message" id="resultMessage"></p>
+        <div class="results-actions">
+          <button class="btn-primary" id="restartBtn">Try again</button>
+          <button class="btn-secondary" id="viewStatsBtn">Dashboard</button>
+        </div>
+        <p class="hint">or press <kbd>Tab</kbd></p>
+      </div>
+    </div>
+
+    <!-- Stats dashboard -->
+    <div class="dashboard hidden" id="dashboard">
+      <div class="dashboard-card">
+        <div class="dashboard-head">
+          <h2>Stats dashboard</h2>
+          <button class="icon-btn" id="dashboardClose" title="Close" aria-label="Close dashboard">✕</button>
+        </div>
+
+        <div class="dash-empty hidden" id="dashEmpty">
+          <p>No tests yet — finish a test to start tracking your stats.</p>
+        </div>
+
+        <div id="dashContent">
+          <div class="dash-hero">
+            <div class="dash-hero-item primary">
+              <span class="dash-hero-value" id="dashBestWpm">0</span>
+              <span class="dash-hero-label">Personal best WPM</span>
+              <span class="dash-hero-sub" id="dashBestCombo">—</span>
+            </div>
+            <div class="dash-hero-item">
+              <span class="dash-hero-value" id="dashAvgWpm">0</span>
+              <span class="dash-hero-label">Average WPM</span>
+            </div>
+            <div class="dash-hero-item">
+              <span class="dash-hero-value" id="dashAvgAcc">0%</span>
+              <span class="dash-hero-label">Avg accuracy</span>
+            </div>
+            <div class="dash-hero-item">
+              <span class="dash-hero-value" id="dashTests">0</span>
+              <span class="dash-hero-label">Tests done</span>
+            </div>
+          </div>
+
+          <h3 class="dash-section-title">Personal bests · WPM</h3>
+          <div class="dash-bests" id="dashBests"></div>
+
+          <h3 class="dash-section-title">WPM trend · last 20 tests</h3>
+          <div class="dash-chart" id="dashChart"></div>
+
+          <h3 class="dash-section-title">Recent tests</h3>
+          <table class="dash-table dash-history" id="dashHistory">
+            <thead>
+              <tr><th>When</th><th>Test</th><th>WPM</th><th>Acc</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+
+          <button class="btn-danger" id="clearStatsBtn">Clear all stats</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script src="script.js?v=4"></script>
+</body>
+</html>
